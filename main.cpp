@@ -142,6 +142,7 @@ public:
   {
     state = _s;
   }
+  
 };
 
 class Comparador
@@ -226,7 +227,7 @@ int calc_h(State s)
 }
 
 
-State swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state)
+State* swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state)
 {
   unsigned long long mask = 0xF;
   short int pos_array_original = 3 * new_zero_linha + new_zero_coluna;                   // posição no array do state onde está o numero q vai trocar com o 0
@@ -246,14 +247,13 @@ State swap_board(unsigned long long state_original, short int zero_linha, short 
   new_state = mask_dois | new_state; // coloca o numero no lugar do zero antigo
 
   unsigned char new_zero_pos = (new_zero_linha << 4) + new_zero_coluna;
-  State novo_estado = State(new_state, new_zero_pos);
+  State *novo_estado = new State(new_state, new_zero_pos);
 
-  // novo_estado.printState();
   return novo_estado;
 }
 
 // gera os sucessores de um nodo n
-void succ(Node n, vector<State> *suc)
+void succ(Node n, vector<State*> *suc)
 {
   State state = n.getState();
   unsigned long long state_original = state.getState();
@@ -306,18 +306,18 @@ int main()
   cout << "\nEstado inicial:: " << endl;
   teste.printState();
 
-  vector<State> sucessores;
+  vector<State*> sucessores;
   Node nodo = Node(&teste);
   succ(nodo, &sucessores);
 
   cout << "Sucessores::: " << endl;
   while (!sucessores.empty())
   {
-    State estado;
+    State *estado;
     estado = sucessores.back();
-    estado.printState();
+    estado->printState();
     sucessores.pop_back();
-    
+    delete estado;
   }
 
   // Node nodo2 = Node(&teste_dois);
