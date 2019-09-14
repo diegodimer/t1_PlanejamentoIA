@@ -13,13 +13,16 @@ using namespace std;
 
 */
 
-class State; // classe que representa o estado
-class Node; // classe que representa um nodo (nodo tem um estado parte dele)
+class State;      // classe que representa o estado
+class Node;       // classe que representa um nodo (nodo tem um estado parte dele)
 class Comparador; // classe que implementa o comparador usado no open set
 
-// mapa com todos os estados (funciona parecido com um hash set)
-unordered_map<int, State *> estados;
+int calc_h(State);
+bool is_goal(State);
+void succ(Node, vector<Node>);
 
+// mapa com todos os estados (funciona parecido com um hash set)
+unordered_map<unsigned long long, State *> estados;
 
 class State
 {
@@ -42,7 +45,7 @@ public:
     }
 
     state = state >> 4; // um if ali testado n vezes é mais facil fazer 4 shifts pro outro lado depois
-    h = calc_h();
+    h = calc_h(*this);
   }
 
   long long getState() const { return state; }
@@ -89,50 +92,6 @@ public:
          << "\n";
   }
 
-  bool is_goal() const { return state == 305419896; } // só vale pro 8-puzzle
-
-  /* Função que gera os sucessores do estado s. Retorna no vetor passado como parâmetro */
-  void succ(vector<State> sucessores) const
-  {
-
-  }
-
-private:
-  /* Função que calcula o valor h(S) */
-  int calc_h() const
-  {
-    unsigned long long position = 0xF00000000; // mascara
-    unsigned long long number = 0;
-    int h_ac = 0;
-    int indice = 8;
-    for (int i = 0; i < 3; i++)
-    {
-      for (int j = 0; j < 3; j++)
-      {
-        number = state & position;     // a mascara pega o primeiro numero
-        number = number >> 4 * indice; // e shifta ele até a posição certa
-        indice -= 1;
-        int should_linha; // linha que devia estar
-        int n = number / 3;
-        if (n < 1)
-        {
-          should_linha = 0;
-        }
-        else if (n < 2)
-        {
-          should_linha = 1;
-        }
-        else
-          should_linha = 2;
-
-        int should_coluna = number % 3;
-        int h = abs(should_linha - i) + abs(should_coluna - j);
-        h_ac += h;
-        position = position >> 4; // move a mascara p/ pegar o próximo numero
-      }
-    }
-    return h_ac;
-  }
 };
 
 class Node
@@ -143,7 +102,7 @@ class Node
 
 public:
   int getG() const { return g; }
-  int getF() const { return f; }
+  int getF() const { return g + state.getH(); }
   int getH() const { return state.getH(); }
   State getState() const { return state; }
 };
@@ -183,11 +142,52 @@ public:
   }
 };
 
+bool is_goal(State s)
+{
+  return s.getState() == 305419896;
+}
+
+int calc_h(State s)
+{
+  unsigned long long position = 0xF00000000; // mascara
+  unsigned long long number = 0;
+  unsigned long long state = s.getState();
+  int h_ac = 0;
+  int indice = 8;
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      number = state & position;     // a mascara pega o primeiro numero
+      number = number >> 4 * indice; // e shifta ele até a posição certa
+      indice -= 1;
+      int should_linha; // linha que devia estar
+      int n = number / 3;
+      if (n < 1)
+      {
+        should_linha = 0;
+      }
+      else if (n < 2)
+      {
+        should_linha = 1;
+      }
+      else
+        should_linha = 2;
+
+      int should_coluna = number % 3;
+      int h = abs(should_linha - i) + abs(should_coluna - j);
+      h_ac += h;
+      position = position >> 4; // move a mascara p/ pegar o próximo numero
+    }
+  }
+  return h_ac;
+}
+
 int main()
 {
-  //State teste = State("7 2 4 5 0 6 8 3 1"); // esse estado é 30674020401 em decimal
-
-  //State teste_dois = State("0 1 2 3 4 5 6 7 8");
+  State teste = State("7 2 4 5 0 6 8 3 1"); // esse estado é 30674020401 em decimal
+  State teste_dois = State("0 1 2 3 4 5 6 7 8");
+  cout << " " << calc_h(teste) << " teste_dois: " << calc_h(teste_dois) << endl;
 
   // cout << teste.is_goal() << " " << teste_dois.is_goal() << "\n";
   // teste_dois.printState();
@@ -197,5 +197,6 @@ int main()
   //   cout <<"a";
   // }
 
-  priority_queue<Node, vector<Node>, Comparador> pq;
+  priority_queue<Node, vector<Node>, Comparador> open;
+  unordered_map<unsigned long long, State> closed;
 }
