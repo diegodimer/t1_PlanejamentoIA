@@ -85,8 +85,6 @@ public:
     int indice = 8;
     cout << "========================"
          << "\n";
-    cout << "Representação do estado: "
-         << "\n";
     for (int i = 0; i < PUZZLE; i++)
     {
 
@@ -130,43 +128,60 @@ class Node
   int g;
   int f;
   State *state;
+  // pode tirar \/
+  Node *whereFrom;
 
 public:
+  static unsigned long index;
+  unsigned long my_index;
   int getG() const { return g; }
   int getF() const { return g + state->getH(); }
   int getH() const { return state->getH(); }
   void setG(int _g) { g = _g; }
   void setF(int _f) { f = _f; }
+  int getindex(){return my_index;}
   State getState() const { return *state; }
   Node(State *_s)
   {
     state = _s;
   }
-  
+  Node(State *_s, int _g){
+    state = _s;
+    g = _g;
+  }
+  // pode tirar \/
+  Node(Node *_pai, State *_s, int _g){
+    whereFrom = _pai;
+    state = _s;
+    g = _g;
+    my_index = ++index;
+  }
+  Node* getWhereFrom(){return whereFrom;}
 };
+unsigned long Node::index = 0;
 
 class Comparador
 {
 public:
-  int operator()(const Node &e1, Node &e2)
+  int operator()(const Node *e1, Node *e2)
   {
-    int e1F = e1.getF();
-    int e2F = e2.getF();
+    int e1F = e1->getF();
+    int e2F = e2->getF();
     if (e1F > e2F)
     {
       return true;
     }
     else if (e1F == e2F)
     {
-      int e1H = e1.getH();
-      int e2H = e2.getH();
+      int e1H = e1->getH();
+      int e2H = e2->getH();
       if (e1H > e2H)
       {
         return true;
       }
       else if (e1H == e2H)
       {
-        return true;
+        return e1->index < e2->index;
       }
       else
       { // NÃO é LIFO (por coisa do C++, ele não garante ordem dos elementos (não segue padrão no iterador))
@@ -178,6 +193,21 @@ public:
       return false;
     }
   }
+};
+
+
+struct State_hash {
+public:
+	size_t operator()(const State & e1) const {
+		return hash<unsigned long long>()(e1.getState());
+	}
+};
+
+struct State_equal {
+public:
+	bool operator()(const State &e1, const State &e2) const {
+    return e1.getState() == e2.getState();
+	}
 };
 
 bool is_goal(State s)
@@ -226,8 +256,7 @@ int calc_h(State s)
   return h_ac;
 }
 
-
-State* swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state)
+State *swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state)
 {
   unsigned long long mask = 0xF;
   short int pos_array_original = 3 * new_zero_linha + new_zero_coluna;                   // posição no array do state onde está o numero q vai trocar com o 0
@@ -253,7 +282,7 @@ State* swap_board(unsigned long long state_original, short int zero_linha, short
 }
 
 // gera os sucessores de um nodo n
-void succ(Node n, vector<State*> *suc)
+void succ(Node n, vector<State *> *suc)
 {
   State state = n.getState();
   unsigned long long state_original = state.getState();
@@ -261,7 +290,7 @@ void succ(Node n, vector<State*> *suc)
   short int zero_linha = (short int)(zero_posicao >> 4);   // empurra 4 bits pra pegar os 4 mais significativos (linha)
   short int zero_coluna = (short int)(0xF & zero_posicao); // mascara 1111 pra pegar os ultimos 4 bits (coluna)
   short int pos_zero_state = 3 * zero_linha + zero_coluna;
-
+  
   if (zero_linha != PUZZLE)
   {
     // não ta na última linha, troca com o de baixo
@@ -284,51 +313,78 @@ void succ(Node n, vector<State*> *suc)
   }
 };
 
-int main()
-{
-  State teste = State("7 2 4 5 0 6 8 3 1"); // esse estado é 30674020401 em decimal
-  State teste_dois = State("0 1 2 3 4 5 6 7 8");
-  // State teste_tres = State("1 0 2 3 4 5 6 7 8");
-  // State teste_quatro = State("1 2 0 3 4 5 6 7 8");
-  // State teste_cinco = State("1 2 3 0 4 5 6 7 8");
-   //cout << " " << calc_h(teste) << " teste_dois: " << calc_h(teste_dois) << endl;
-
-  // cout << teste.is_goal() << " " << teste_dois.is_goal() << "\n";
-  // teste_dois.printState();
-  // cout << teste_dois.getH() << "\n";
-
-  // if (mapa.end() == mapa.find(e)){
-  //   cout <<"a";
-  // }
-  // priority_queue<Node, vector<Node>, Comparador> open;
-  // unordered_map<unsigned long long, State> closed;
-
-  cout << "\nEstado inicial:: " << endl;
-  teste.printState();
-
-  vector<State*> sucessores;
-  Node nodo = Node(&teste);
-  succ(nodo, &sucessores);
-
-  cout << "Sucessores::: " << endl;
-  while (!sucessores.empty())
-  {
-    State *estado;
-    estado = sucessores.back();
-    estado->printState();
-    sucessores.pop_back();
-    delete estado;
+void extract_path(Node* n){
+  Node *nlinha = n;
+  while(nlinha->getWhereFrom() != NULL){
+    Node *pai = nlinha->getWhereFrom();
+    pai->getState().printState();
+    nlinha = nlinha->getWhereFrom();
   }
 
-  // Node nodo2 = Node(&teste_dois);
-  // succ(nodo2, sucessores);
+}
+int A_STAR()
+{
+  State *teste = new State("0 6 1 7 4 2 3 8 5"); // esse estado é 30674020401 em decimal
+  int nodos_expandidos = 0;
+  int viz = 0;
+  priority_queue<Node*, vector<Node*>, Comparador> open;
+  unordered_set<State, State_hash, State_equal> closed;
 
-  // Node nodo3 = Node(&teste_tres);
-  // succ(nodo3, sucessores);
+  Node *raiz = new Node(NULL, teste, 0);
+  open.push(raiz);
+  int iteracoes = 0;
+  while (!open.empty())
+  {
+    iteracoes++;
+    Node *n = open.top();
+    open.pop();
+    State n_state = n->getState();
+    if (closed.find(n_state) == closed.end()) // não ta no closed set
+    {
+      closed.insert(n_state);
+      if (is_goal(n_state))
+      {
+        cout << "GOAL REACHED" << endl;
+        n_state.printState();
+        cout << "COST : " << n->getF() << " EXPANDIDOS: " << nodos_expandidos << "\n";
+        extract_path(n);
+        return 0;
+      }
+      vector<State *> sucessores;
+      succ(*n, &sucessores);
+      nodos_expandidos++;
+      while (!sucessores.empty())
+      {
+        State *estado = sucessores.back();
+        int new_g = n->getF() - n->getH() + 1; // 1 é o custo da transição
+        Node *n_linha = new Node(n, estado, new_g);
+        sucessores.pop_back();
+        open.push(n_linha);
+      }
+    }
+  }
+}
 
-  // Node nodo4 = Node(&teste_quatro);
-  // succ(nodo4, sucessores);
+int main(){
+  //  priority_queue<Node*, vector<Node*>, Comparador> open;
+  //  State *s1 = new State("0 6 1 7 4 2 3 8 5");
+  //  Node *n2 = new Node(NULL, s1, 0);
+  //  Node *n3 = new Node(NULL, s1, 2);
+  //  Node *n4 = new Node(NULL, s1, 0);
+  //  Node *n5 = new Node(NULL, s1, 0);
+  //  Node *n6 = new Node(NULL, s1, 3);
+  //  open.push( n2 );
+  //  open.push( n3 );
+  //  open.push( n4 );
+  //  open.push( n5 );
+  //  open.push( n6 );
+  // while( !open.empty()){
+  //   Node *top = open.top();
+  //   cout << " topo: " << top->getindex() << endl;
+  //   open.pop();
+  // }
+  A_STAR();
+   
+   
 
-  // Node nodo5 = Node(&teste_cinco);
-  // succ(nodo5, sucessores);
 }
