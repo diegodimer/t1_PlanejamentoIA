@@ -1,6 +1,7 @@
 #include <iostream>
 #include <bits/stdc++.h>
 #include <cstdio>
+#include <queue>
 
 #define PUZZLE 3
 #define GOAL 305419896
@@ -291,25 +292,25 @@ void succ(Node n, vector<State *> *suc)
   short int zero_coluna = (short int)(0xF & zero_posicao); // mascara 1111 pra pegar os ultimos 4 bits (coluna)
   short int pos_zero_state = 3 * zero_linha + zero_coluna;
   
-  if (zero_linha != PUZZLE)
+  if (zero_linha != PUZZLE-1)
   {
     // não ta na última linha, troca com o de baixo
     suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha + 1, zero_coluna, pos_zero_state));
   }
 
-  if (zero_linha != 0)
+  if (zero_coluna != PUZZLE-1)
   { // não ta na primeira linha, troca com o de cima
-    suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state));
+    suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna + 1, pos_zero_state));
   }
-
+  
   if (zero_coluna != 0)
   { // não ta na primeira linha, troca com o de cima
     suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna - 1, pos_zero_state));
   }
-
-  if (zero_coluna != PUZZLE)
+  
+  if (zero_linha != 0)
   { // não ta na primeira linha, troca com o de cima
-    suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna + 1, pos_zero_state));
+    suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state));
   }
 };
 
@@ -364,6 +365,54 @@ int A_STAR()
     }
   }
 }
+int bfs_graph()
+{ 
+  int expandido = 0;
+  
+  State *teste = new State("0 6 1 7 4 2 3 8 5");
+  Node *raiz = new Node(NULL, teste, 0);
+  
+  queue<Node*> open;
+  open.push(raiz);
+  
+  unordered_set <unsigned long long> closed;
+  closed.insert(teste->getState());
+  
+  while(!open.empty()){
+    Node* n = open.front();
+    open.pop();
+    
+    State steste = n->getState();
+    
+    vector<State*> successors;
+    succ(*n,&successors);
+    
+    expandido++;
+    
+    while(!successors.empty()){
+        State *s_linha = successors.back();      
+        Node *n_linha;
+        
+        if(closed.find(s_linha->getState())== closed.end()){
+          closed.insert(s_linha->getState());
+          int new_g = n->getG() + 1;
+          n_linha = new Node(n, s_linha, new_g);
+          open.push(n_linha);
+        }
+      
+        if(is_goal(*s_linha)){
+          cout << "goal reached! Nodos expandidos: " << expandido << " custo: " << n_linha->getG()
+               << "\n";
+          s_linha->printState();
+          extract_path(n_linha);
+          return 0;
+        }
+        
+        successors.pop_back();
+    }   
+  }
+  return -1;
+}
 
 int main(){
   //  priority_queue<Node*, vector<Node*>, Comparador> open;
@@ -383,8 +432,8 @@ int main(){
   //   cout << " topo: " << top->getindex() << endl;
   //   open.pop();
   // }
-  A_STAR();
+  //A_STAR();
+  bfs_graph();
+  
    
-   
-
 }
