@@ -2,6 +2,8 @@
 #include <bits/stdc++.h>
 #include <cstdio>
 #include <queue>
+#include <tr1/functional>
+#include <unordered_set>
 #include "blackbox.h"
 #define PUZZLE 3
 #define GOAL 305419896
@@ -160,7 +162,7 @@ int Comparador::operator()(const Node *e1, Node *e2)
 
 size_t State_hash::operator()(const State &e1) const
 {
-    return hash<unsigned long long>()(e1.getState());
+    return tr1::hash<unsigned long long>()(e1.getState());
 }
 
 bool State_equal::operator()(const State &e1, const State &e2) const
@@ -222,14 +224,14 @@ State *swap_board(unsigned long long state_original, short int zero_linha, short
     mask_dois = mask_dois & state_original;                                                // mask_dois tem o número que  vai trocar com o zero
     unsigned long long new_state = state_original & (~mask_dois);                          // faz o AND com a negação da mascara para zerar onde está o número que ia trocar com o zero
     // shifto o mask_dois até onde estava o zero antes e faço or com new_state
-    short int offset = pos_array_original - pos_zero_state; // nao existe shift negativo
+    short int offset = (pos_array_original - pos_zero_state) * 4; // nao existe shift negativo
     if (offset < 0)
     {
-        mask_dois = mask_dois >> abs(offset) * 4;
+        mask_dois = mask_dois >> (short int)abs(offset);
     }
     else
     {
-        mask_dois = mask_dois << offset * 4;
+        mask_dois = mask_dois << offset;
     }
     new_state = mask_dois | new_state; // coloca o numero no lugar do zero antigo
 

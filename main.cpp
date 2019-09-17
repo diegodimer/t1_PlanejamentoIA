@@ -41,7 +41,7 @@ int main(){
   //   cout << " topo: " << "index: " << top->getindex() << " F: " << top->getF() << " H:" << top->getH()  << endl;
   //   open.pop();
   // }
-  //A_STAR();
+  A_STAR();
   //bfs_graph();
   
    

@@ -1,6 +1,10 @@
 #include <iostream>
 #include "astar.h"
 #include "blackbox.h"
+#include <vector>
+#include <bits/stdc++.h>
+#include <unordered_set>	
+#include <queue>
 
 int A_STAR()
 {
@@ -8,7 +12,7 @@ int A_STAR()
   int nodos_expandidos = 0;
   int viz = 0;
   priority_queue<Node*, vector<Node*>, Comparador> open;
-  unordered_set<State, State_hash, State_equal> closed;
+  std::unordered_set<State, State_hash, State_equal> closed;
 
   Node *raiz = new Node(NULL, teste, 0);
   open.push(raiz);
@@ -28,7 +32,7 @@ int A_STAR()
         cout << "GOAL REACHED" << endl;
         n_state.printState();
         cout << "COST : " << n->getF() << " EXPANDIDOS: " << nodos_expandidos << " CLOSED SIZE: " << closed.size() << endl;
-        // extract_path(n);
+        extract_path(n);
         return 0;
       }
       vector<State *> sucessores;
