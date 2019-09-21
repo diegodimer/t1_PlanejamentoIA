@@ -19,7 +19,7 @@ using namespace std;
 */
 
 
-
+typedef int (*FnPtr)(string);
 
 int main(int argc, char *argv[]){
   //  priority_queue<Node*, vector<Node*>, Comparador> open;
@@ -43,6 +43,10 @@ int main(int argc, char *argv[]){
   // }
   //A_STAR();
   //bfs_graph();
+  std::map<std::string, FnPtr> myMap;
+  myMap["-astar"] = A_STAR;
+  myMap["-bfs"] = bfs_graph;
+
   string algorithm = string(argv[1]);
   string command;
   for(int i=2; i<argc; i++){
@@ -54,7 +58,7 @@ int main(int argc, char *argv[]){
   std::string token;
   while (std::getline(iss, token, ','))
   {
-    bfs_graph(token);
+    myMap[algorithm](token);
   }
  
 }
