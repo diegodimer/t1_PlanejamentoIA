@@ -144,6 +144,19 @@ Node *Node::getWhereFrom() { return whereFrom; }
 
 unsigned int Node::index = 0;
 
+int Comparador_gbfs::operator()(const Node *n1, const Node *n2){
+
+ if(n1->getH() > n2->getH()){
+    return true;
+ }
+ else if(n1->getH() == n2->getH()){
+    return n1->getindex() < n2->getindex();
+ }
+ else{   
+    return false;
+ }   
+}
+
 int Comparador::operator()(const Node *e1, Node *e2)
 {
     int e1F = e1->getF();
@@ -206,10 +219,12 @@ int calc_h(State s)
             number = state & position;     // a mascara pega o primeiro numero
             number = number >> (4 * indice); // e shifta ele até a posição certa
             indice -= 1;
+          if(number!=0){
             int should_linha = floor(number/PUZZLE); // linha que devia estar
             int should_coluna = number % PUZZLE;
             int h = abs(should_linha - i) + abs(should_coluna - j);
             h_ac += h;
+          }
             position = position >> 4; // move a mascara p/ pegar o próximo numero
         }
     }

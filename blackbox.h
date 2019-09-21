@@ -81,7 +81,11 @@ class Comparador
 public:
   int operator()(const Node *e1, Node *e2);
 };
-
+class Comparador_gbfs
+{
+  public:
+    int operator()(const Node *n1, const Node *n2);
+};
 
 struct State_hash {
 public:
