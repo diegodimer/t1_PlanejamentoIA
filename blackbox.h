@@ -6,8 +6,12 @@
 #include <cstdio>
 #include <queue>
 
-#define PUZZLE 3
-#define GOAL 305419896
+// #define PUZZLE 4
+// #define GOAL 81985529216486895
+// #define MAX_INDEX 15
+// #define PUZZLE 3
+// #define GOAL 305419896
+// #define MAX_INDEX 8
 using namespace std;
 /* 
 
@@ -85,15 +89,15 @@ class Comparador_gbfs
 
 struct State_hash {
 public:
-	size_t operator()(const State & e1) const;
+	size_t operator()(const unsigned long long & e1) const;
 };
 
 struct State_equal {
 public:
-	bool operator()(const State &e1, const State &e2) const;
+	bool operator()(const unsigned long long &e1, const unsigned long long &e2) const;
 };
 
-bool is_goal(State s);
+bool is_goal(unsigned long long s);
 
 int calc_h(State s);
 
@@ -103,5 +107,6 @@ void succ(Node n, vector<State *> *suc);
 
 void extract_path(Node* n);
 
+void print_results(Node, int);
 
 #endif

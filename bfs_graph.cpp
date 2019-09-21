@@ -1,13 +1,11 @@
 #include <iostream>
 #include "blackbox.h"
 
-int bfs_graph()
+int bfs_graph(string _state)
 { 
-  int expandido = 0;
-  
-  State *teste = new State("0 6 1 7 4 2 3 8 5");
+  State *teste = new State(_state);
   Node *raiz = new Node(NULL, teste, 0);
-  
+  int h_inicial = raiz->getH();
   queue<Node*> open;
   open.push(raiz);
   
@@ -23,8 +21,6 @@ int bfs_graph()
     vector<State*> successors;
     succ(*n,&successors);
     
-    expandido++;
-    
     while(!successors.empty()){
         State *s_linha = successors.back();      
         Node *n_linha;
@@ -36,11 +32,8 @@ int bfs_graph()
           open.push(n_linha);
         }
       
-        if(is_goal(*s_linha)){
-          cout << "goal reached! Nodos expandidos: " << expandido << " custo: " << n_linha->getG()
-               << "\n";
-          s_linha->printState();
-          extract_path(n_linha);
+        if(is_goal((*s_linha).getState())){
+          print_results(*n_linha, h_inicial);
           return 0;
         }
         

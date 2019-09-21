@@ -21,9 +21,9 @@ using namespace std;
 */
 
 
+typedef int (*FnPtr)(string);
 
-
-int main(){
+int main(int argc, char *argv[]){
   //  priority_queue<Node*, vector<Node*>, Comparador> open;
   //  State *s1 = new State("0 6 1 7 4 2 3 8 5");
   //  State *s2 = new State("0 6 1 7 4 2 3 8 5");
@@ -45,13 +45,24 @@ int main(){
   // }
   //A_STAR();
   //bfs_graph();
-  //iterative_deepening();
-   
-  State *s1 = new State("2 4 7 0 3 6 8 1 5");
-    
-  int valor_h = calc_h(*s1);
-    
-   cout << "valor heuristica: " << valor_h << "\n";
-    
-    
+
+  std::map<std::string, FnPtr> myMap;
+  myMap["-astar"] = A_STAR;
+  myMap["-bfs"] = bfs_graph;
+
+  string algorithm = string(argv[1]);
+  string command;
+  for(int i=2; i<argc; i++){
+    command+=argv[i];
+    if( argv[i][1] != ',')
+    command+=" ";
+  }
+  std::istringstream iss(command);
+  std::string token;
+  while (std::getline(iss, token, ','))
+  {
+    myMap[algorithm](token);
+  }
+ 
+
 }
