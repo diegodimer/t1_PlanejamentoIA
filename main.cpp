@@ -6,6 +6,7 @@
 #include "blackbox.h"
 #include "bfs_graph.h"
 #include "astar.h"
+#include "idastar.h"
 
 using namespace std;
 /* 
@@ -46,6 +47,7 @@ int main(int argc, char *argv[]){
   std::map<std::string, FnPtr> myMap;
   myMap["-astar"] = A_STAR;
   myMap["-bfs"] = bfs_graph;
+  myMap["-idastar"] = IDASTAR;
 
   string algorithm = string(argv[1]);
   string command;
