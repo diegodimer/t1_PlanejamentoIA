@@ -6,6 +6,8 @@
 #include "blackbox.h"
 #include "bfs_graph.h"
 #include "astar.h"
+#include "iterative_deepening.h"
+#include "greedy_bfs.h"
 
 using namespace std;
 /* 
@@ -41,8 +43,15 @@ int main(){
   //   cout << " topo: " << "index: " << top->getindex() << " F: " << top->getF() << " H:" << top->getH()  << endl;
   //   open.pop();
   // }
-  A_STAR();
+  //A_STAR();
   //bfs_graph();
-  
+  //iterative_deepening();
    
+  State *s1 = new State("2 4 7 0 3 6 8 1 5");
+    
+  int valor_h = calc_h(*s1);
+    
+   cout << "valor heuristica: " << valor_h << "\n";
+    
+    
 }

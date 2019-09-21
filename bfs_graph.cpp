@@ -18,7 +18,7 @@ int bfs_graph()
     Node* n = open.front();
     open.pop();
     
-    State steste = n->getState();
+    //State steste = n->getState();
     
     vector<State*> successors;
     succ(*n,&successors);
