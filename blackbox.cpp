@@ -5,44 +5,58 @@
 #include <tr1/functional>
 #include <unordered_set>
 #include "blackbox.h"
-#define PUZZLE 3
-#define GOAL 305419896
+#include <ctime>
+
 using namespace std;
+static int nodos_expandidos;
+static int heuristica_acumulada;
+static int heuristica_index;
+static short int PUZZLE; //3
+static long long GOAL; //305419896
+static short int MAX_INDEX; //8
+clock_t start_t;
+clock_t end_t;
+void print_results(Node n, int h_inicial){
+    // nodos expandidos, comprimento da solução otima, tempo, heuristica media, heuristica inicial
+    end_t = clock();
+    double elapsed_secs = double(end_t - start_t) / CLOCKS_PER_SEC;
+    cout<<nodos_expandidos << ", " << n.getF() << ", " << elapsed_secs<< ", "<< (float)heuristica_acumulada/heuristica_index << ", " << h_inicial << endl;
+}
 
 State::State(string _state)
 {
+    start_t = clock();
     state = 0;
-    for (int i = 0; i < _state.length(); i++)
-    {
-        if (_state[i] != ' ')
-        {
-            unsigned char num = (unsigned char)_state[i] - '0';
-            state += num;
-            state = state << 4;
+    std::istringstream iss(_state);
+    std::string token;
+    short int index = 0;
 
-            if (_state[i] == '0')
-            {
-                unsigned char should_linha; // linha que devia estar
-                int n = i / 6;
-                if (n < 1)
-                {
-                    should_linha = 0x0;
-                }
-                else if (n < 2)
-                {
-                    should_linha = 0x1;
-                }
-                else
-                    should_linha = 0x2;
-
-                unsigned char should_coluna = (i / 2) % 3;
-                posicao_zero = (should_linha << 4) | should_coluna;
-            }
-        }
+    if ( _state.size() <= 18){
+        PUZZLE = 3;
+        GOAL = 305419896;
+        MAX_INDEX = 8;
+    } else {
+        PUZZLE = 4;
+        GOAL = 81985529216486895;
+        MAX_INDEX = 15;
     }
+    
+    while (std::getline(iss, token, ' '))
+    {
+        unsigned char num = stoi(token);
+        state += num;
+        if(index < MAX_INDEX)
+            state = state << 4;
+        if(num == 0){
+            int linha = floor(index/PUZZLE);
+            int coluna = floor(index % PUZZLE);
+            posicao_zero = (linha<<4) | coluna;
 
-    state = state >> 4; // um if ali testado n vezes é mais facil fazer 4 shifts pro outro lado depois
+        }
+        index++;
+    }
     h = calc_h(*this);
+
 }
 State::State(unsigned long long _state, unsigned char _posicao_zero)
 {
@@ -59,9 +73,10 @@ unsigned char State::getPosZero() const { return posicao_zero; }
 /* Função que printa o estado (fins de debug) */
 void State::printState() const
 {
-    unsigned long long position = 0xF00000000; // tem 8 zeros pq ignora 8 numeros pra pegar o primeiro
+    unsigned long long position = 0xF; // mascara
+    position = position <<( ( (PUZZLE*PUZZLE)-1)*4 );
     unsigned long long number = 0;
-    int indice = 8;
+    int indice = PUZZLE*PUZZLE -1;
     cout << "========================"
          << "\n";
     for (int i = 0; i < PUZZLE; i++)
@@ -160,59 +175,45 @@ int Comparador::operator()(const Node *e1, Node *e2)
     }
 }
 
-size_t State_hash::operator()(const State &e1) const
+size_t State_hash::operator()(const unsigned long long &e1) const
 {
-    return tr1::hash<unsigned long long>()(e1.getState());
+    return tr1::hash<unsigned long long>()(e1);
 }
 
-bool State_equal::operator()(const State &e1, const State &e2) const
+bool State_equal::operator()(const unsigned long long &e1, const unsigned long long &e2) const
 {
-    return e1.getState() == e2.getState();
+    return e1 == e2;
 }
 
-bool is_goal(State s)
+bool is_goal(unsigned long long s)
 {
-    return s.getState() == GOAL;
+    return s == GOAL;
 }
 
 int calc_h(State s)
 {
-    unsigned long long position = 0xF00000000; // mascara
+    heuristica_index++;
+    unsigned long long position = 0xF; // mascara
+    position = position <<( ( (PUZZLE*PUZZLE)-1)*4 );
     unsigned long long number = 0;
     unsigned long long state = s.getState();
     int h_ac = 0;
-    int indice = 8;
+    int indice = (PUZZLE*PUZZLE)-1;
     for (int i = 0; i < PUZZLE; i++)
     {
         for (int j = 0; j < PUZZLE; j++)
         {
             number = state & position;     // a mascara pega o primeiro numero
-            number = number >> 4 * indice; // e shifta ele até a posição certa
+            number = number >> (4 * indice); // e shifta ele até a posição certa
             indice -= 1;
-            int should_linha; // linha que devia estar
-            int n = number / PUZZLE;
-            if (n < 1)
-            {
-                should_linha = 0;
-            }
-            else if (n < 2)
-            {
-                should_linha = 1;
-            }
-            else if (n < 3)
-            {
-                should_linha = 2;
-            }
-            else
-            {
-                should_linha = 3;
-            }
+            int should_linha = floor(number/PUZZLE); // linha que devia estar
             int should_coluna = number % PUZZLE;
             int h = abs(should_linha - i) + abs(should_coluna - j);
             h_ac += h;
             position = position >> 4; // move a mascara p/ pegar o próximo numero
         }
     }
+    heuristica_acumulada+=h_ac;
     return h_ac;
 }
 
@@ -244,6 +245,7 @@ State *swap_board(unsigned long long state_original, short int zero_linha, short
 // gera os sucessores de um nodo n
 void succ(Node n, vector<State *> *suc)
 {
+    nodos_expandidos++;
     State state = n.getState();
     unsigned long long state_original = state.getState();
     unsigned char zero_posicao = state.getPosZero();

@@ -21,7 +21,7 @@ using namespace std;
 
 
 
-int main(){
+int main(int argc, char *argv[]){
   //  priority_queue<Node*, vector<Node*>, Comparador> open;
   //  State *s1 = new State("0 6 1 7 4 2 3 8 5");
   //  State *s2 = new State("0 6 1 7 4 2 3 8 5");
@@ -41,8 +41,20 @@ int main(){
   //   cout << " topo: " << "index: " << top->getindex() << " F: " << top->getF() << " H:" << top->getH()  << endl;
   //   open.pop();
   // }
-  A_STAR();
+  //A_STAR();
   //bfs_graph();
-  
-   
+  string algorithm = string(argv[1]);
+  string command;
+  for(int i=2; i<argc; i++){
+    command+=argv[i];
+    if( argv[i][1] != ',')
+    command+=" ";
+  }
+  std::istringstream iss(command);
+  std::string token;
+  while (std::getline(iss, token, ','))
+  {
+    bfs_graph(token);
+  }
+ 
 }

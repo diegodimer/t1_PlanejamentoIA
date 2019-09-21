@@ -1,4 +1,5 @@
 #ifndef BFS_GRAPH_H
 #define BFS_GRAPH_H
-int bfs_graph();
+#include <iostream>
+int bfs_graph(std::string);
 #endif
