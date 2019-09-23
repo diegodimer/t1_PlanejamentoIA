@@ -144,7 +144,7 @@ Node *Node::getWhereFrom() { return whereFrom; }
 
 unsigned int Node::index = 0;
 
-int Comparador_gbfs::operator()(const Node *n1, const Node *n2){
+int Comparador_gbfs::operator()(const Node *n1, Node *n2){
 
  if(n1->getH() > n2->getH()){
     return true;
@@ -259,7 +259,15 @@ State *swap_board(unsigned long long state_original, short int zero_linha, short
 
 // gera os sucessores de um nodo n
 void succ(Node n, vector<State *> *suc)
-{
+{   
+    // linhas de codigo usadas para testar se um filho gerado e igual ao pai de n
+    Node* nodo_pai = n.getWhereFrom();
+    unsigned long long pai;
+    if(nodo_pai!=NULL)
+      pai = nodo_pai->getState().getState();
+    else pai = 0;
+    State* filho;
+    
     nodos_expandidos++;
     State state = n.getState();
     unsigned long long state_original = state.getState();
@@ -271,22 +279,30 @@ void succ(Node n, vector<State *> *suc)
     if (zero_linha != PUZZLE - 1)
     {
         // não ta na última linha, troca com o de baixo
-        suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha + 1, zero_coluna, pos_zero_state));
+        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha + 1, zero_coluna, pos_zero_state);
+        if(filho->getState()!=pai)
+          suc->push_back(filho);
     }
 
     if (zero_coluna != PUZZLE - 1)
-    { // não ta na primeira linha, troca com o de cima
-        suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna + 1, pos_zero_state));
+    { // não ta na primeira linha, troca com o da direita
+        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna + 1, pos_zero_state);
+        if(filho->getState()!=pai)
+          suc->push_back(filho);
     }
 
     if (zero_coluna != 0)
-    { // não ta na primeira linha, troca com o de cima
-        suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna - 1, pos_zero_state));
+    { // não ta na primeira linha, troca com o da esquerda
+        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna - 1, pos_zero_state);
+        if(filho->getState()!=pai)
+          suc->push_back(filho);
     }
 
     if (zero_linha != 0)
     { // não ta na primeira linha, troca com o de cima
-        suc->push_back(swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state));
+        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state);
+        if(filho->getState()!=pai)
+          suc->push_back(filho);
     }
 };
 

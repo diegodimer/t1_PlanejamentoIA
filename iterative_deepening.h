@@ -1,6 +1,6 @@
 #ifndef ITERATIVE_DEEPENING_H
 #define ITERATIVE_DEEPENING_H
-
-int iterative_deepening();
+#include <iostream>
+int iterative_deepening(std::string);
 
 #endif
