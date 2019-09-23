@@ -1,5 +1,5 @@
-#ifndef ASTAR_H
-#define ASTAR_H
+#ifndef IDASTAR_H
+#define IDASTAR_H
 #include <iostream>
 #include "blackbox.h"
 #include <vector>
@@ -7,5 +7,5 @@
 #include <unordered_set>	
 #include <queue>
 
-int A_STAR(string);
+int IDASTAR(string);
 #endif

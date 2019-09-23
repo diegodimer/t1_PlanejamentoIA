@@ -6,8 +6,10 @@
 #include "blackbox.h"
 #include "bfs_graph.h"
 #include "astar.h"
+#include "idastar.h"
 #include "iterative_deepening.h"
 #include "greedy_bfs.h"
+
 
 using namespace std;
 /* 
@@ -52,6 +54,7 @@ int main(int argc, char *argv[]){
   std::map<std::string, FnPtr> myMap;
   myMap["-astar"] = A_STAR;
   myMap["-bfs"] = bfs_graph;
+  myMap["-idastar"] = IDASTAR;
   myMap["-idfs"] = iterative_deepening;
 
   string algorithm = string(argv[1]);
