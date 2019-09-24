@@ -72,6 +72,7 @@ public:
   Node(State *_s);
   Node(State *_s, int _g);
   Node(Node *_pai, State *_s, int _g);
+  Node();
   Node* getWhereFrom();
 };
 
@@ -107,6 +108,6 @@ void succ(Node n, vector<State *> *suc);
 
 void extract_path(Node* n);
 
-void print_results(Node, int);
+void print_results(Node, int, float);
 
 #endif

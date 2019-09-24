@@ -9,18 +9,16 @@
 
 using namespace std;
 static int nodos_expandidos;
-static int heuristica_acumulada;
-static int heuristica_index;
 static short int PUZZLE; //3
 static long long GOAL; //305419896
 static short int MAX_INDEX; //8
 clock_t start_t;
 clock_t end_t;
-void print_results(Node n, int h_inicial){
+void print_results(Node n, int h_inicial, float h_media){
     // nodos expandidos, comprimento da solução otima, tempo, heuristica media, heuristica inicial
     end_t = clock();
     double elapsed_secs = double(end_t - start_t) / CLOCKS_PER_SEC;
-    cout<<nodos_expandidos << ", " << n.getF() << ", " << elapsed_secs<< ", "<< (double)heuristica_acumulada/heuristica_index << ", " << h_inicial << endl;
+    cout<<nodos_expandidos << ", " << n.getF() << ", " << elapsed_secs<< ", "<< h_media << ", " << h_inicial << endl;
 }
 
 State::State(string _state)
@@ -30,8 +28,6 @@ State::State(string _state)
     std::istringstream iss(_state);
     std::string token;
     short int index = 0;
-    heuristica_acumulada = 0;
-    heuristica_index = 0;
     nodos_expandidos = 0;
     if ( _state.size() <= 18){
         PUZZLE = 3;
@@ -58,7 +54,7 @@ State::State(string _state)
         index++;
     }
     h = calc_h(*this);
-    this->printState();
+    
 }
 State::State(unsigned long long _state, unsigned char _posicao_zero)
 {
@@ -106,6 +102,7 @@ int Node::getF() const { return g + state->getH(); }
 int Node::getH() const { return state->getH(); }
 void Node::setG(int _g) { g = _g; }
 void Node::setH(int _h) { state->setH(_h); }
+Node::Node() { }
 unsigned int Node::getindex() const { return my_index; }
 State Node::getState() const { return *state; }
 Node::Node(State *_s)
@@ -212,8 +209,6 @@ int calc_h(State s)
             position = position >> 4; // move a mascara p/ pegar o próximo numero
         }
     }
-    heuristica_index++;
-    heuristica_acumulada+=h_ac;
     return h_ac;
 }
 

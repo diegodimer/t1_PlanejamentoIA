@@ -1,11 +1,16 @@
 #include <iostream>
 #include "blackbox.h"
+int heuristica_ac1;
+int heuristica_ind1;
+
 
 int bfs_graph(string _state)
 { 
   State *teste = new State(_state);
   Node *raiz = new Node(NULL, teste, 0);
   int h_inicial = raiz->getH();
+  heuristica_ac1 = h_inicial;
+  heuristica_ind1 = 1;
   queue<Node*> open;
   open.push(raiz);
   
@@ -29,11 +34,13 @@ int bfs_graph(string _state)
           closed.insert(s_linha->getState());
           int new_g = n->getG() + 1;
           n_linha = new Node(n, s_linha, new_g);
+          heuristica_ac1+=n_linha->getH();
+          heuristica_ind1++;
           open.push(n_linha);
         }
       
         if(is_goal((*s_linha).getState())){
-          print_results(*n_linha, h_inicial);
+          print_results(*n_linha, h_inicial, (float)heuristica_ac1/heuristica_ind1);
           return 0;
         }
         

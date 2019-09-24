@@ -22,11 +22,11 @@ using namespace std;
 
 */
 
-
 typedef int (*FnPtr)(string);
 
-int main(int argc, char *argv[]){
-//int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
+  //int main(int argc, char *argv[]){
   //  priority_queue<Node*, vector<Node*>, Comparador> open;
   //  State *s1 = new State("0 6 1 7 4 2 3 8 5");
   //  State *s2 = new State("0 6 1 7 4 2 3 8 5");
@@ -48,9 +48,7 @@ int main(int argc, char *argv[]){
   // }
   //A_STAR();
   //bfs_graph();
-    
-    
-  
+
   std::map<std::string, FnPtr> myMap;
   myMap["-astar"] = A_STAR;
   myMap["-bfs"] = bfs_graph;
@@ -59,10 +57,11 @@ int main(int argc, char *argv[]){
 
   string algorithm = string(argv[1]);
   string command;
-  for(int i=2; i<argc; i++){
-    command+=argv[i];
-    if( argv[i][1] != ',')
-    command+=" ";
+  for (int i = 2; i < argc; i++)
+  {
+    command += argv[i];
+    if (command[command.length()-1] != ',')
+      command += " ";
   }
   std::istringstream iss(command);
   std::string token;
@@ -70,13 +69,11 @@ int main(int argc, char *argv[]){
   {
     myMap[algorithm](token);
   }
-  
-  
+
   /*
   greedy_bfs();
   State *teste = new State("2 4 7 0 3 6 8 1 5"); 
   cout << calc_h(*teste) << "\n";
    */
   return 0;
-
 }

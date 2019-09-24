@@ -7,14 +7,17 @@
 #include <queue>
 int A_STAR(string _state)
 {
-  State *teste = new State(_state); // esse estado é 30674020401 em decimal
+  State teste = State(_state); // esse estado é 30674020401 em decimal
   priority_queue<Node *, vector<Node *>, Comparador> open;
   std::unordered_set<unsigned long long, State_hash, State_equal> closed;
 
-  Node *raiz = new Node(NULL, teste, 0);
+  Node *raiz = new Node(NULL, &teste, 0);
+  Node *n_linha;
   open.push(raiz);
   int h_inicial = raiz->getH();
   int iteracoes = 0;
+  int heuristica_ac5=h_inicial;
+  int heuristica_ind5=1;
   while (!open.empty())
   {
     iteracoes++;
@@ -26,7 +29,12 @@ int A_STAR(string _state)
       closed.insert(n_state);
       if (is_goal(n_state))
       {
-        print_results(*n, h_inicial);
+        print_results(*n, h_inicial, (float)heuristica_ac5/heuristica_ind5);
+        while(!open.empty()){
+          Node *n_del = open.top();
+          open.pop();
+          delete n_del;
+        }
         return 0;
       }
       vector<State *> sucessores;
@@ -35,12 +43,16 @@ int A_STAR(string _state)
       {
         State *estado = sucessores.back();
         int new_g = n->getG() + 1; // n->getH() + 0; // 1 é o custo da transição
-        Node *n_linha = new Node(n, estado, new_g);
+        n_linha = new Node(n, estado, new_g);
+        heuristica_ind5++;
+        heuristica_ac5+=n_linha->getH();
         sucessores.pop_back();
         open.push(n_linha);
       }
-    }
     delete n;
+    }
+    
   }
-  cout<<"Goal not found!"<<endl;
+  cout<<"GOAL NOT REACHED"<<endl;
+  return -1;
 }
