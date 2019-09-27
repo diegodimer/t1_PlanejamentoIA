@@ -28,6 +28,7 @@ State::State(string _state)
     std::istringstream iss(_state);
     std::string token;
     short int index = 0;
+    Node::index = 0;
     nodos_expandidos = 0;
     if ( _state.size() <= 18){
         PUZZLE = 3;

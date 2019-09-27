@@ -1,6 +1,11 @@
 #ifndef GREEDY_BFS_H
 #define GREEDY_BFS_H
-
-int greedy_bfs();
+#include <iostream>
+#include "blackbox.h"
+#include <vector>
+#include <bits/stdc++.h>
+#include <unordered_set>	
+#include <queue>
+int greedy_bfs(string);
 
 #endif

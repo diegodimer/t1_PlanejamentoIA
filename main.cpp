@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   myMap["-bfs"] = bfs_graph;
   myMap["-idastar"] = IDASTAR;
   myMap["-idfs"] = iterative_deepening;
-
+  myMap["-gbfs"] = greedy_bfs;
   string algorithm = string(argv[1]);
   string command;
   for (int i = 2; i < argc; i++)
