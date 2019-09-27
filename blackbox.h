@@ -69,6 +69,7 @@ public:
   void setH(int _h);
   unsigned int getindex() const;
   State getState() const;
+  State* getStatePointer() const;
   Node(State *_s);
   Node(State *_s, int _g);
   Node(Node *_pai, State *_s, int _g);
@@ -90,12 +91,12 @@ class Comparador_gbfs
 
 struct State_hash {
 public:
-	size_t operator()(const unsigned long long & e1) const;
+	size_t operator()(Node const *e1) const;
 };
 
 struct State_equal {
 public:
-	bool operator()(const unsigned long long &e1, const unsigned long long &e2) const;
+	bool operator()(Node const *e1, Node const *e2) const;
 };
 
 bool is_goal(unsigned long long s);

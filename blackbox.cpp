@@ -105,6 +105,7 @@ void Node::setH(int _h) { state->setH(_h); }
 Node::Node() { }
 unsigned int Node::getindex() const { return my_index; }
 State Node::getState() const { return *state; }
+State* Node::getStatePointer() const{ return state;}
 Node::Node(State *_s)
 {
     state = _s;
@@ -170,14 +171,14 @@ int Comparador::operator()(const Node *e1, Node *e2)
     }
 }
 
-size_t State_hash::operator()(const unsigned long long &e1) const
+size_t State_hash::operator()(Node const *e1) const
 {
-    return tr1::hash<unsigned long long>()(e1);
+    return tr1::hash<unsigned long long>()(e1->getState().getState());
 }
 
-bool State_equal::operator()(const unsigned long long &e1, const unsigned long long &e2) const
+bool State_equal::operator()(Node const *e1, Node const *e2) const
 {
-    return e1 == e2;
+    return e1->getState().getState() == e2->getState().getState();
 }
 
 bool is_goal(unsigned long long s)

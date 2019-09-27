@@ -9,7 +9,7 @@ int A_STAR(string _state)
 {
   State teste = State(_state); // esse estado é 30674020401 em decimal
   priority_queue<Node *, vector<Node *>, Comparador> open;
-  std::unordered_set<unsigned long long, State_hash, State_equal> closed;
+  std::unordered_set<Node*, State_hash, State_equal> closed;
 
   Node *raiz = new Node(NULL, &teste, 0);
   Node *n_linha;
@@ -23,17 +23,20 @@ int A_STAR(string _state)
     iteracoes++;
     Node *n = open.top();
     open.pop();
-    unsigned long long n_state = n->getState().getState();
-    if (closed.find(n_state) == closed.end()) // não ta no closed set
+    State *n_state = n->getStatePointer();
+    if (closed.find(n) == closed.end()) // não ta no closed set
     {
-      closed.insert(n_state);
-      if (is_goal(n_state))
+      closed.insert(n);
+      if (is_goal(n->getState().getState()))
       {
         print_results(*n, h_inicial, (float)heuristica_ac5/heuristica_ind5);
         while(!open.empty()){
           Node *n_del = open.top();
           open.pop();
           delete n_del;
+        }
+        for (auto& it: closed) {
+          delete it;
         }
         return 0;
       }
@@ -49,7 +52,6 @@ int A_STAR(string _state)
         sucessores.pop_back();
         open.push(n_linha);
       }
-    delete n;
     }
     
   }
