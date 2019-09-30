@@ -9,16 +9,17 @@
 
 using namespace std;
 static int nodos_expandidos;
-static short int PUZZLE; //3
-static long long GOAL; //305419896
+static short int PUZZLE;    //3
+static long long GOAL;      //305419896
 static short int MAX_INDEX; //8
 clock_t start_t;
 clock_t end_t;
-void print_results(Node n, int h_inicial, float h_media){
+void print_results(Node n, int h_inicial, float h_media)
+{
     // nodos expandidos, comprimento da solução otima, tempo, heuristica media, heuristica inicial
     end_t = clock();
     double elapsed_secs = double(end_t - start_t) / CLOCKS_PER_SEC;
-    cout<<nodos_expandidos << ", " << n.getF() << ", " << elapsed_secs<< ", "<< h_media << ", " << h_inicial << endl;
+    cout << nodos_expandidos << ", " << n.getF() << ", " << elapsed_secs << ", " << h_media << ", " << h_inicial << endl;
 }
 
 State::State(string _state)
@@ -30,32 +31,34 @@ State::State(string _state)
     short int index = 0;
     Node::index = 0;
     nodos_expandidos = 0;
-    if ( _state.size() <= 18){
+    if (_state.size() <= 18)
+    {
         PUZZLE = 3;
         GOAL = 305419896;
         MAX_INDEX = 8;
-    } else {
+    }
+    else
+    {
         PUZZLE = 4;
         GOAL = 0x123456789ABCDEF;
         MAX_INDEX = 15;
     }
-    
+
     while (std::getline(iss, token, ' '))
     {
         unsigned char num = stoi(token);
         state += num;
-        if(index < MAX_INDEX)
+        if (index < MAX_INDEX)
             state = state << 4;
-        if(num == 0){
-            int linha = floor(index/PUZZLE);
+        if (num == 0)
+        {
+            int linha = floor(index / PUZZLE);
             int coluna = floor(index % PUZZLE);
-            posicao_zero = (linha<<4) | coluna;
-
+            posicao_zero = (linha << 4) | coluna;
         }
         index++;
     }
     h = calc_h(*this);
-    
 }
 State::State(unsigned long long _state, unsigned char _posicao_zero)
 {
@@ -73,7 +76,7 @@ unsigned char State::getPosZero() const { return posicao_zero; }
 void State::printState() const
 {
     unsigned long long position = 0xF; // mascara
-    position = position <<(MAX_INDEX*4);
+    position = position << (MAX_INDEX * 4);
     unsigned long long number = 0;
     int indice = MAX_INDEX;
     cout << "========================"
@@ -86,7 +89,7 @@ void State::printState() const
             number = state & position;     // a mascara pega o primeiro numero
             number = number >> 4 * indice; // e shifta ele até a posição certa
             indice -= 1;
-            int should_linha= floor(number/PUZZLE);
+            int should_linha = floor(number / PUZZLE);
             int should_coluna = number % PUZZLE;
             int h = abs(should_linha - i) + abs(should_coluna - j);
             cout << number << " (h(n): " << h << ")   ";
@@ -103,10 +106,10 @@ int Node::getF() const { return g + state->getH(); }
 int Node::getH() const { return state->getH(); }
 void Node::setG(int _g) { g = _g; }
 void Node::setH(int _h) { state->setH(_h); }
-Node::Node() { }
+Node::Node() {}
 unsigned int Node::getindex() const { return my_index; }
 State Node::getState() const { return *state; }
-State* Node::getStatePointer() const{ return state;}
+State *Node::getStatePointer() const { return state; }
 Node::Node(State *_s)
 {
     state = _s;
@@ -128,17 +131,26 @@ Node *Node::getWhereFrom() { return whereFrom; }
 
 unsigned int Node::index = 0;
 
-int Comparador_gbfs::operator()(const Node *n1, Node *n2){
+int Comparador_gbfs::operator()(const Node *n1, Node *n2)
+{
 
- if(n1->getH() > n2->getH()){
-    return true;
- }
- else if(n1->getH() == n2->getH()){
-    return n1->getindex() < n2->getindex();
- }
- else{   
-    return false;
- }   
+    if (n1->getH() > n2->getH())
+    {
+        return true;
+    }
+    else if (n1->getH() == n2->getH())
+    {
+        if (n1->getG() > n2->getG())
+            return false;
+        else if (n1->getG() == n2->getG())
+            return n1->getindex() < n2->getindex();
+        else
+            return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 int Comparador::operator()(const Node *e1, Node *e2)
@@ -190,7 +202,7 @@ bool is_goal(unsigned long long s)
 int calc_h(State s)
 {
     unsigned long long position = 0xF; // mascara
-    position = position <<( MAX_INDEX*4 );
+    position = position << (MAX_INDEX * 4);
     unsigned long long number = 0;
     unsigned long long state = s.getState();
     int h_ac = 0;
@@ -199,15 +211,16 @@ int calc_h(State s)
     {
         for (int j = 0; j < PUZZLE; j++)
         {
-            number = state & position;     // a mascara pega o primeiro numero
+            number = state & position;       // a mascara pega o primeiro numero
             number = number >> (4 * indice); // e shifta ele até a posição certa
             indice -= 1;
-          if(number!=0){
-            int should_linha = floor(number/PUZZLE); // linha que devia estar
-            int should_coluna = number % PUZZLE;
-            int h = abs(should_linha - i) + abs(should_coluna - j);
-            h_ac += h;
-          }
+            if (number != 0)
+            {
+                int should_linha = floor(number / PUZZLE); // linha que devia estar
+                int should_coluna = number % PUZZLE;
+                int h = abs(should_linha - i) + abs(should_coluna - j);
+                h_ac += h;
+            }
             position = position >> 4; // move a mascara p/ pegar o próximo numero
         }
     }
@@ -217,10 +230,10 @@ int calc_h(State s)
 State *swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state)
 {
     unsigned long long mask = 0xF;
-    short int pos_array_original = PUZZLE * new_zero_linha + new_zero_coluna;                   // posição no array do state onde está o numero q vai trocar com o 0
+    short int pos_array_original = PUZZLE * new_zero_linha + new_zero_coluna;    // posição no array do state onde está o numero q vai trocar com o 0
     unsigned long long mask_dois = mask << 4 * (MAX_INDEX - pos_array_original); // mask_dois é do tipo 0000F000 e F é onde está o número que vai trocar com o 0
-    mask_dois = mask_dois & state_original;                                                // mask_dois tem o número que  vai trocar com o zero
-    unsigned long long new_state = state_original & (~mask_dois);                          // faz o AND com a negação da mascara para zerar onde está o número que ia trocar com o zero
+    mask_dois = mask_dois & state_original;                                      // mask_dois tem o número que  vai trocar com o zero
+    unsigned long long new_state = state_original & (~mask_dois);                // faz o AND com a negação da mascara para zerar onde está o número que ia trocar com o zero
     // shifto o mask_dois até onde estava o zero antes e faço or com new_state
     short int offset = (pos_array_original - pos_zero_state) * 4; // nao existe shift negativo
     if (offset < 0)
@@ -241,15 +254,16 @@ State *swap_board(unsigned long long state_original, short int zero_linha, short
 
 // gera os sucessores de um nodo n
 void succ(Node n, vector<State *> *suc)
-{   
+{
     // linhas de codigo usadas para testar se um filho gerado e igual ao pai de n
-    Node* nodo_pai = n.getWhereFrom();
+    Node *nodo_pai = n.getWhereFrom();
     unsigned long long pai;
-    if(nodo_pai!=NULL)
-      pai = nodo_pai->getState().getState();
-    else pai = 0;
-    State* filho;
-    
+    if (nodo_pai != NULL)
+        pai = nodo_pai->getState().getState();
+    else
+        pai = 0;
+    State *filho;
+
     nodos_expandidos++;
     State state = n.getState();
     unsigned long long state_original = state.getState();
@@ -262,29 +276,29 @@ void succ(Node n, vector<State *> *suc)
     {
         // não ta na última linha, troca com o de baixo
         filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha + 1, zero_coluna, pos_zero_state);
-        if(filho->getState()!=pai)
-          suc->push_back(filho);
+        if (filho->getState() != pai)
+            suc->push_back(filho);
     }
 
     if (zero_coluna != (PUZZLE - 1))
     { // não ta na primeira linha, troca com o da direita
         filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna + 1, pos_zero_state);
-        if(filho->getState()!=pai)
-          suc->push_back(filho);
+        if (filho->getState() != pai)
+            suc->push_back(filho);
     }
 
     if (zero_coluna != 0)
     { // não ta na primeira linha, troca com o da esquerda
         filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna - 1, pos_zero_state);
-        if(filho->getState()!=pai)
-          suc->push_back(filho);
+        if (filho->getState() != pai)
+            suc->push_back(filho);
     }
 
     if (zero_linha != 0)
     { // não ta na primeira linha, troca com o de cima
         filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state);
-        if(filho->getState()!=pai)
-          suc->push_back(filho);
+        if (filho->getState() != pai)
+            suc->push_back(filho);
     }
 };
 
