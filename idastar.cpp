@@ -4,18 +4,20 @@
 #include <bits/stdc++.h>
 #include <unordered_set>
 #include <queue>
+#include <vector>
 
 static int h_inicial;
 static int stop;
 int heuristica_ac3;
 int heuristica_ind3;
-
+vector<Node *> passados;
 int recursive_function(Node *n, int *f_limit)
 {
+    heuristica_ind3++;
+    heuristica_ac3+=n->getH();
     if (n->getF() > (*f_limit))
     {
         int ret = n->getF();
-        delete n;
         n = NULL;
         return ret;
     }
@@ -35,8 +37,7 @@ int recursive_function(Node *n, int *f_limit)
             State *estado = sucessores.back();
             int new_g = n->getG() + 1;
             Node *n_linha = new Node(n, estado, new_g);
-            heuristica_ind3++;
-            heuristica_ac3+=n_linha->getH();
+            passados.push_back(n_linha);
             sucessores.pop_back();
             next_limit = recursive_function(n_linha, f_limit);
         }
@@ -57,5 +58,11 @@ int IDASTAR(string _state)
     {
         rec_limit = recursive_function(n_zero, &rec_limit);
 
+    }
+    delete n_zero;
+    while(!passados.empty()){
+        Node *n = passados.back();
+        passados.pop_back();
+        delete n;
     }
 }
