@@ -40,7 +40,8 @@ int bfs_graph(string _state)
         }
       
         if(is_goal((*s_linha).getState())){
-          print_results(*n_linha, h_inicial, (float)heuristica_ac1/heuristica_ind1);
+          //print_results(*n_linha, h_inicial, (float)heuristica_ac1/heuristica_ind1);
+          print_results(*n_linha, h_inicial, 0);//sem heuristica nesse algortimo
           return 0;
         }
         
