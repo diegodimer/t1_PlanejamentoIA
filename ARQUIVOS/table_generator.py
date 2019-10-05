@@ -18,7 +18,10 @@ def single_file():
                 line = inp.readline().rstrip('\n')
                 lista = line.split(',')
                 if lista != ['']:
-                    outp.write( "%s & %s & %s & %s & %s & %s \\\\\n" % (str(i), lista[0], lista[1], '{:.7f}'.format(float(lista[2])), lista[3], lista[4]) )
+                    if lista[0]=='-':
+                        outp.write( "%s & %s & %s & %s & %s & %s \\\\\n" % (str(i), '-', '-', '-', '-', '-') )
+                    else:
+                        outp.write( "%s & %s & %s & %s & %s & %s \\\\\n" % (str(i), lista[0], lista[1], '{:.7f}'.format(float(lista[2])), lista[3], lista[4]) )
                     i+=1
                 else:
                     break

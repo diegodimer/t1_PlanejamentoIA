@@ -9,6 +9,7 @@ int A_STAR(string _state)
 {
   State teste = State(_state); // esse estado é 30674020401 em decimal
   priority_queue<Node *, vector<Node *>, Comparador> open;
+    
   std::unordered_set<Node*, State_hash, State_equal> closed;
 
   Node *raiz = new Node(NULL, &teste, 0);
@@ -35,9 +36,11 @@ int A_STAR(string _state)
           open.pop();
           delete n_del;
         }
+          
         for (auto& it: closed) {
           delete it;
         }
+        
         return 0;
       }
       vector<State *> sucessores;
