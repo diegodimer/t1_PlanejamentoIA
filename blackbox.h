@@ -36,6 +36,7 @@ class State
 public:
   State(string _state);
   State(unsigned long long _state, unsigned char _posicao_zero);
+  State(unsigned long long _state, unsigned char _posicao_zero, int _h);
   State();
   long long getState() const;
   int getH() const ;
@@ -97,7 +98,7 @@ bool is_goal(unsigned long long s);
 
 int calc_h(State s);
 
-State *swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state);
+State *swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state, int h_pai);
 
 void succ(Node n, vector<State *> *suc);
 

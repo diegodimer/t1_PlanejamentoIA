@@ -66,6 +66,12 @@ State::State(unsigned long long _state, unsigned char _posicao_zero)
     posicao_zero = _posicao_zero;
     h = calc_h(*this);
 }
+State::State(unsigned long long _state, unsigned char _posicao_zero, int _h)
+{
+    state = _state;
+    posicao_zero = _posicao_zero;
+    h = _h;
+}
 State::State() {}
 long long State::getState() const { return state; }
 int State::getH() const { return h; }
@@ -227,12 +233,13 @@ int calc_h(State s)
     return h_ac;
 }
 
-State *swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state)
+State *swap_board(unsigned long long state_original, short int zero_linha, short int zero_coluna, short int new_zero_linha, short int new_zero_coluna, short int pos_zero_state, int h_pai)
 {
     unsigned long long mask = 0xF;
     short int pos_array_original = PUZZLE * new_zero_linha + new_zero_coluna;    // posição no array do state onde está o numero q vai trocar com o 0
     unsigned long long mask_dois = mask << 4 * (MAX_INDEX - pos_array_original); // mask_dois é do tipo 0000F000 e F é onde está o número que vai trocar com o 0
     mask_dois = mask_dois & state_original;                                      // mask_dois tem o número que  vai trocar com o zero
+    short int number = mask_dois  >> 4 * (MAX_INDEX - pos_array_original); // numero de fato que troca com o zero
     unsigned long long new_state = state_original & (~mask_dois);                // faz o AND com a negação da mascara para zerar onde está o número que ia trocar com o zero
     // shifto o mask_dois até onde estava o zero antes e faço or com new_state
     short int offset = (pos_array_original - pos_zero_state) * 4; // nao existe shift negativo
@@ -247,7 +254,12 @@ State *swap_board(unsigned long long state_original, short int zero_linha, short
     new_state = mask_dois | new_state; // coloca o numero no lugar do zero antigo
 
     unsigned char new_zero_pos = (new_zero_linha << 4) + new_zero_coluna;
-    State *novo_estado = new State(new_state, new_zero_pos);
+    int should_linha = floor(number / PUZZLE); // linha que devia estar
+    int should_coluna = number % PUZZLE;
+    // zero_linha e zero_coluna = onde o numero está no sucessor
+    // new_zero_linha new_zero_coluna = onde ta o numero no original
+    int heurstic_change = h_pai - (abs(new_zero_linha - should_linha) + abs(new_zero_coluna - should_coluna)) + (abs(zero_linha - should_linha) + abs(zero_coluna - should_coluna));
+    State *novo_estado = new State(new_state, new_zero_pos, heurstic_change);
 
     return novo_estado;
 }
@@ -271,32 +283,33 @@ void succ(Node n, vector<State *> *suc)
     short int zero_linha = (short int)(zero_posicao >> 4);   // empurra 4 bits pra pegar os 4 mais significativos (linha)
     short int zero_coluna = (short int)(0xF & zero_posicao); // mascara 1111 pra pegar os ultimos 4 bits (coluna)
     short int pos_zero_state = PUZZLE * zero_linha + zero_coluna;
+    int h_pai = state.getH();
 
     if (zero_linha != (PUZZLE - 1))
     {
         // não ta na última linha, troca com o de baixo
-        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha + 1, zero_coluna, pos_zero_state);
+        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha + 1, zero_coluna, pos_zero_state, h_pai);
         if (filho->getState() != pai)
             suc->push_back(filho);
     }
 
     if (zero_coluna != (PUZZLE - 1))
     { // não ta na primeira linha, troca com o da direita
-        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna + 1, pos_zero_state);
+        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna + 1, pos_zero_state, h_pai);
         if (filho->getState() != pai)
             suc->push_back(filho);
     }
 
     if (zero_coluna != 0)
     { // não ta na primeira linha, troca com o da esquerda
-        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna - 1, pos_zero_state);
+        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna - 1, pos_zero_state, h_pai);
         if (filho->getState() != pai)
             suc->push_back(filho);
     }
 
     if (zero_linha != 0)
     { // não ta na primeira linha, troca com o de cima
-        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state);
+        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state, h_pai);
         if (filho->getState() != pai)
             suc->push_back(filho);
     }
