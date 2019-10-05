@@ -6,12 +6,7 @@
 #include <cstdio>
 #include <queue>
 
-// #define PUZZLE 4
-// #define GOAL 81985529216486895
-// #define MAX_INDEX 15
-// #define PUZZLE 3
-// #define GOAL 305419896
-// #define MAX_INDEX 8
+
 using namespace std;
 /* 
 
@@ -56,7 +51,6 @@ class Node
 {
   int g;
   State *state;
-  // pode tirar \/
   Node *whereFrom;
 
 public:

@@ -119,7 +119,7 @@ Node::Node(State *_s, int _g)
     state = _s;
     g = _g;
 }
-// pode tirar \/
+
 Node::Node(Node *_pai, State *_s, int _g)
 {
     whereFrom = _pai;
@@ -202,18 +202,18 @@ bool is_goal(unsigned long long s)
 int calc_h(State s)
 {
     unsigned long long position = 0xF; // mascara
-    position = position << (MAX_INDEX * 4);
+    //position = position << (MAX_INDEX * 4);
     unsigned long long number = 0;
     unsigned long long state = s.getState();
     int h_ac = 0;
-    int indice = MAX_INDEX;
-    for (int i = 0; i < PUZZLE; i++)
+    int indice = 0;
+    for (int i = PUZZLE-1; i >= 0; i--)
     {
-        for (int j = 0; j < PUZZLE; j++)
+        for (int j = PUZZLE-1; j >= 0; j--)
         {
             number = state & position;       // a mascara pega o primeiro numero
             number = number >> (4 * indice); // e shifta ele até a posição certa
-            indice -= 1;
+            indice += 1;
             if (number != 0)
             {
                 int should_linha = floor(number / PUZZLE); // linha que devia estar
@@ -221,7 +221,7 @@ int calc_h(State s)
                 int h = abs(should_linha - i) + abs(should_coluna - j);
                 h_ac += h;
             }
-            position = position >> 4; // move a mascara p/ pegar o próximo numero
+            position = position << 4; // move a mascara p/ pegar o próximo numero
         }
     }
     return h_ac;
