@@ -269,11 +269,12 @@ void succ(Node n, vector<State *> *suc)
 {
     // linhas de codigo usadas para testar se um filho gerado e igual ao pai de n
     Node *nodo_pai = n.getWhereFrom();
-    unsigned long long pai;
-    if (nodo_pai != NULL)
+    unsigned long long pai = 0;
+    unsigned char pos_zero_pai = ~(0x00);
+    if (nodo_pai != NULL){
         pai = nodo_pai->getState().getState();
-    else
-        pai = 0;
+        pos_zero_pai = nodo_pai->getState().getPosZero();
+    }
     State *filho;
 
     nodos_expandidos++;
@@ -285,33 +286,38 @@ void succ(Node n, vector<State *> *suc)
     short int pos_zero_state = PUZZLE * zero_linha + zero_coluna;
     int h_pai = state.getH();
 
+        
     if (zero_linha != (PUZZLE - 1))
     {
         // não ta na última linha, troca com o de baixo
-        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha + 1, zero_coluna, pos_zero_state, h_pai);
-        if (filho->getState() != pai)
+        if( (((zero_linha+1) << 4) + zero_coluna) != pos_zero_pai){
+            filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha + 1, zero_coluna, pos_zero_state, h_pai);
             suc->push_back(filho);
+        }
     }
 
     if (zero_coluna != (PUZZLE - 1))
     { // não ta na primeira linha, troca com o da direita
+        if( ((zero_linha << 4) + (zero_coluna+1)) != pos_zero_pai){
         filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna + 1, pos_zero_state, h_pai);
-        if (filho->getState() != pai)
-            suc->push_back(filho);
+        suc->push_back(filho);
+        }
     }
 
     if (zero_coluna != 0)
     { // não ta na primeira linha, troca com o da esquerda
-        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna - 1, pos_zero_state, h_pai);
-        if (filho->getState() != pai)
+        if( (((zero_linha) << 4) + (zero_coluna-1)) != pos_zero_pai){
+            filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha, zero_coluna - 1, pos_zero_state, h_pai);
             suc->push_back(filho);
+        }
     }
 
     if (zero_linha != 0)
     { // não ta na primeira linha, troca com o de cima
-        filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state, h_pai);
-        if (filho->getState() != pai)
+        if( (((zero_linha-1) << 4) + zero_coluna) != pos_zero_pai){
+            filho = swap_board(state_original, zero_linha, zero_coluna, zero_linha - 1, zero_coluna, pos_zero_state, h_pai);
             suc->push_back(filho);
+        }
     }
 };
 
