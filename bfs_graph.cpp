@@ -3,6 +3,13 @@
 int heuristica_ac1;
 int heuristica_ind1;
 
+/*
+breadth first search graph:
+Faz a busca em largura do conjunto de soluçoes. O nodo expandido eh
+adicionado ao open set (implementado em queue) se o estado nao pertence 
+ao closed set (implementado com unordered set).
+
+*/
 
 int bfs_graph(string _state)
 { 

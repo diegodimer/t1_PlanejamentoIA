@@ -5,6 +5,12 @@ int expandido = 0;
 int heuristica_ac4;
 int heuristica_ind4;
 
+/*
+iterative deepening:
+O algoritmo realiza uma busca em profundidade com limite de profundidade 
+incrementado a cada iteraçao da funcao principal. Nao existe open set
+pois ele esta implicito na pilha de recursao de depth_limited_search
+*/
 
 Node* depth_limited_search(Node *n, int depth_limit)
 {

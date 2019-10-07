@@ -4,7 +4,12 @@
 int heuristica_ac2;
 int heuristica_ind2;
 
-
+/*
+greedy breadth first search:
+O algoritmo expande sempre o nodo do open set com menor valor h. 
+Open set implemetado com priority_queue e closed set 
+implementado com unordered_set.
+*/
 int greedy_bfs(string _state){
 
   //State *teste = new State("0 6 1 7 4 2 3 8 5");
