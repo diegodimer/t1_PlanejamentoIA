@@ -5,6 +5,17 @@
 #include <bits/stdc++.h>
 #include <unordered_set>
 #include <queue>
+
+/**
+ * ASTAR
+ * a idéia é igual o pseudo algoritmo: enquanto o openset (implementado como uma priority 
+ * queue com um comparador que a torna uma min heap) tiver elementos o algoritmo continua
+ * expandindo e gerando os sucessores daquele nodo, tendo o cuidado para não expandir 
+ * estados que já estão no closed set (implementados como um unordered_set (escolhido por
+ * ser mais rápido que o ordered_set). Quando chega no estado objetivo, desalocamos os 
+ * ponteiros que estão no open e no closed set.
+ * 
+ */
 int A_STAR(string _state)
 {
   State teste = State(_state); // esse estado é 30674020401 em decimal

@@ -7,6 +7,32 @@
 #include "blackbox.h"
 #include <ctime>
 
+/**
+ * BLACKBOX
+ * O objetivo aqui foi simular as funções de blackbox como estudadas em aula.
+ * O estado é representado por um long long (64 bits) onde cada célula ocupa
+ * 4 bits. O teste de is_goal fica trivial: comparamos com um numero (0x12345678 
+ * e 0x123456789ABCDEF). Variáveis de PUZZLE (índice da maior coluna (3 ou 4)),
+ * MAX_INDEX (qual máximo índice alcançado no array para o tabuleiro (8 ou 15))
+ * e GOAL são setadas quando o primeiro estado é criado (o único que é gerado a
+ * partir de uma string). A função de calc_h calcula a heurística para um estado
+ * passando por todas as células (usando operações de shift e and lógico) e cal-
+ * cula a distância de manhattan até a posição que esse número deveria estar. 
+ * A geração de sucessores é basicamente mudar a posição do zero, para otimizar
+ * isso resolvemos salvar separado do estado (em 1 byte) a posição do zero: para
+ * não gerar o sucessor de um estado igual o pai, compara-se a posição do zero
+ * do pai com a do estado a ser gerado. Na geração de sucessores também se fez
+ * a otimização de não recalcular a heurística para o estado inteiro: precisa
+ * apenas remover da heuristica do estado o impacto que o número que trocou com
+ * o zero tinha e somar o impacto que ele passou a ter, assim salvamos algum 
+ * tempo de processamento. As funções de extract_path e print_state são auxilia-
+ * res que nos ajudaram no debug dos algoritmos. Adicionou-se ao estado também 
+ * uma variável de índice para funcionar como time stamp, que é o critério de
+ * desempate do A*, que tem seu comparador implementado aqui também, assim como
+ * o gbfs. A função de hash do open set do A* é implementada aqui também, sendo
+ * apenas uma chamada a função nativa de hash com o long long que representa o
+ * estado.
+*/
 using namespace std;
 static int nodos_expandidos;
 static short int PUZZLE;    //3

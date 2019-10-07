@@ -5,7 +5,15 @@
 #include <unordered_set>
 #include <queue>
 #include <vector>
-
+/**
+ * IDASTAR
+ * A função recursiva continua sendo chamada enquanto uma variável
+ * (chamada de stop) tem seu valor setado em 0. A variável é setada
+ * em 1 quando o estado objetivo é alcançado, fazendo a busca parar 
+ * e retornar o caminho esperado. O vector de "passados" é como 
+ * limpamos a memória depois da execução do algoritmo, desalocando
+ * os ponteiros que foram alocados quando gerados os nodos.
+ */
 static int h_inicial;
 static int stop;
 int heuristica_ac3;
